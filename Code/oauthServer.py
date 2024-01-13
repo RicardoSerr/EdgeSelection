@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Implementation of an Oauth Server to work alongside Edge Selection API
+
+Author: Ricardo Serrano
+"""
+
 from flask import Flask, jsonify, request
 import json
 import secrets
