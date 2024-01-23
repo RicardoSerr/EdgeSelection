@@ -145,7 +145,7 @@ def get_edge_node_ip():
         else:
             return jsonify({'code': 'UNKNOWN_ERROR', 'status': response.status_code, 'error': 'An unknown error occurred.'}), response.status_code
 
-    return jsonify({'error': 'Provide either msisdn or ip_address.'}), 400
+    return jsonify({400: {'error': 'Provide either msisdn or ip_address.'}}), 400
 
 # ADMIN FUNCTIONALITIES: This methods are not part of the EdgeSelection API Scope yet usefull
 # Access to this methods is limited by the OAuth Server
@@ -175,16 +175,16 @@ def update_dataseed():
 
         # Validate that 'data' field is present in the request
         if 'data' not in updated_data:
-            return jsonify({'error': 'Missing "data" field in the request.'}), 400
+            return jsonify({400:{'error': 'Missing "data" field in the request.'}}), 400
 
         # Update the dataseed.json file with the new data
         with open('dataseed.json', 'w') as file:
             json.dump({'data': updated_data['data']}, file, indent=2)
 
-        return jsonify({'message': 'DataSeed updated successfully.'}), 200
+        return jsonify({200:{'message': 'DataSeed updated successfully.'}}), 200
 
     except Exception as e:
-        return jsonify({'error': f'Error updating DataSeed: {str(e)}'}), 500
+        return jsonify({500:{'error': f'Error updating DataSeed: {str(e)}'}}), 500
 
 if __name__ == '__main__':
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
