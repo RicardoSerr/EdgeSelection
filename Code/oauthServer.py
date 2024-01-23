@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Implementation of an Oauth Server to work alongside Edge Selection API
-
-Author: Ricardo Serrano
-"""
-
 from flask import Flask, jsonify, request
 import json
 import secrets
@@ -14,11 +7,11 @@ import os
 
 app = Flask(__name__)
 
-# URL Patterns for resource access segmentation. 
-# MODIFY WITH CORRECT URL:PORT -> Currently IP = 10.0.0.1:2023
-allEdges_pattern = r'https://10\.0\.0\.1:2023/Edge_Selection'
-msisdn_pattern = r'https://10\.0\.0\.1:2023/Edge_Selection\?msisdn=\d{11}'
-ipadr_pattern = r'https://10\.0\.0\.1:2023/Edge_Selection\?ip_address=\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,4}'
+# URL Patterns for resource access segmentation
+allEdges_pattern = r'https://192\.168\.1\.92:2023/SimpleEdge'
+admin_pattern = r'https://192\.168\.1\.92:2023/adminEdgeSites'
+msisdn_pattern = r'https://192\.168\.1\.92:2023/SimpleEdge\?msisdn=\d{11}'
+ipadr_pattern = r'https://192\.168\.1\.92:2023/SimpleEdge\?ip_address=\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,4}'
 
 # Tokens file path
 TOKENS_FILE = 'tokens.json'
@@ -26,19 +19,19 @@ TOKENS_FILE = 'tokens.json'
 # User List examples
 users_credentials = [
     {
-        'client_id': 'ricardoSerrano', 
-        'client_secret': 'Telefonica123', 
-        'allowed_urls': [allEdges_pattern, msisdn_pattern, ipadr_pattern]
+        'client_id': 'ricardoSerrano',
+        'client_secret': 'Telefonica123',
+        'allowed_urls': [allEdges_pattern, msisdn_pattern, ipadr_pattern, admin_pattern]
     },
     {
-        'client_id': 'user1', 
+        'client_id': 'user1',
         'client_secret': 'Password123',
-        'allowed_urls': [msisdn_pattern]
+        'allowed_urls': [msisdn_pattern, allEdges_pattern]
     },
     {
-        'client_id': 'user2', 
+        'client_id': 'user2',
         'client_secret': 'Password123',
-        'allowed_urls': [ipadr_pattern]
+        'allowed_urls': [ipadr_pattern, allEdges_pattern]
     }
 ]
 
@@ -73,6 +66,9 @@ def check_token():
             if user['client_id'] == client_id:
                 for allowed_url_pattern in user['allowed_urls']:
                     if re.match(allowed_url_pattern, url_to_access):
+                        # Remove the used token from the tokens dictionary
+                        del tokens[access_token]
+                        save_tokens(tokens)  # Save the updated tokens to the JSON file
                         return jsonify({'message': f'Access granted to {url_to_access}'}), 200
 
         # If the URL doesn't match any allowed URL pattern for the user
@@ -88,11 +84,16 @@ def generate_token():
 
     # Check if the provided credentials match any user in the list
     if any(user['client_id'] == client_id and user['client_secret'] == client_secret for user in users_credentials):
-        # Generate access token 
-        access_token = secrets.token_hex(16)
-
         # Load existing tokens or create an empty dictionary
         tokens = load_tokens()
+
+        # Remove any existing token associated with the user
+        existing_tokens = [token for token, user_id in tokens.items() if user_id == client_id]
+        for existing_token in existing_tokens:
+            del tokens[existing_token]
+
+        # Generate access token
+        access_token = secrets.token_hex(16)
 
         # Store the generated token
         tokens[access_token] = client_id
@@ -104,6 +105,7 @@ def generate_token():
     else:
         return jsonify({'error': 'Invalid client credentials'}), 401
 
+
 # Delete Tokens file when the program ends
 @atexit.register
 def delete_tokens_file():
@@ -113,7 +115,4 @@ def delete_tokens_file():
         pass
 
 if __name__ == '__main__':
-    # MODIFY WITH CORRECT IP ADDRESS AND PORT.
-    # Use a private IP where this program is being launched or 0.0.0.0 to allow access from all local network interfaces.
-    app.run(host='10.0.0.65', port=2000)
-
+    app.run(host='192.168.1.65', port=2000)
