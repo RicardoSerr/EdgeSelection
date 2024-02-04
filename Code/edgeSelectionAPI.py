@@ -112,7 +112,7 @@ def get_edge_node_ip():
         if msisdn:
             url = f'https://{VD_IpPort}/services/2SSL/REST/UserProfile/PerfilComercialExt?msisdn={msisdn}&attribute=NAS-id'
         else:
-            url = f'https://{VD_IpPort}/services/2SSL/REST/UserProfile/PerfilComercialExt?IpAddr={ip_address}&attribute=NAS-id'
+            url = f'https://{VD_IpPort}/services/2SSL/REST/UserProfile/PerfilComercialExt?IpBAM={ip_address}&attribute=NAS-id'
 
         response = requests.get(url, verify=False)
 
