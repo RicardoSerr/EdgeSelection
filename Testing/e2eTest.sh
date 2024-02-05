@@ -74,19 +74,16 @@ updated_data='{"data": [
       "NAS-id": "DCBESP2_vUGW01",
       "NAS-Group IP": "10.0.0.1",
       "EdgeNode": "TE_sev_675",
-      "EdgeNode IP": "23.127.0.4"
     },
     {
       "NAS-id": "DCBTYB2_vUGW01",
       "NAS-Group IP": "10.0.0.2",
       "EdgeNode": "TE_alco_231",
-      "EdgeNode IP": "23.127.0.1"
     },
     {
       "NAS-id": "DCVCAR2_vUGW01",
       "NAS-Group IP": "10.0.0.3",
       "EdgeNode": "TE_bcn_129",
-      "EdgeNode IP": "23.127.0.3"
     }]}'
 response_put_admin=$(make_put_request "https://$API_SERVER/adminEdgeSites" "$token1" "$updated_data")
 echo "PUT Admin API Response:"
